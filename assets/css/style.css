@@ -126,6 +126,10 @@ svg{width:1.1em;height:1.1em;flex:none}
 .order .invalid{border-color:#b5523b}
 .order button{justify-self:start}
 .form-msg{background:#eef4e6;color:#3d5a2a;padding:12px 16px;border-radius:12px;margin:0;font-size:.95rem}
+.form-err{background:#f8e9e4;color:#8a3a26}
+.form-err a{color:inherit;font-weight:600}
+.order button:disabled{opacity:.6;cursor:wait;transform:none}
+.order{position:relative}
 
 .visit{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(32px,6vw,72px);align-items:stretch}
 .visit dl{margin:0 0 2rem;display:grid;gap:4px}

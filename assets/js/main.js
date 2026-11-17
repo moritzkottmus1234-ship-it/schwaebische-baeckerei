@@ -39,11 +39,14 @@
     items.forEach(function (el) { el.classList.add('in'); });
   }
 
-  // Demo-Formular: sendet nichts
+  // Vorbestellung: wird per FormSubmit als E-Mail verschickt
   var form = document.getElementById('order-form');
   if (form) {
     var dateInput = form.querySelector('input[type=date]');
     if (dateInput) dateInput.min = new Date().toISOString().slice(0, 10);
+    var msg = form.querySelector('.form-msg');
+    var err = form.querySelector('.form-err');
+    var btn = form.querySelector('button[type=submit]');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var ok = true;
@@ -53,8 +56,29 @@
         if (bad) ok = false;
       });
       if (!ok) return;
-      form.querySelector('.form-msg').hidden = false;
-      form.reset();
+      if (form.elements._honey && form.elements._honey.value) return;
+      msg.hidden = true; err.hidden = true;
+      btn.disabled = true; var label = btn.textContent; btn.textContent = 'Wird gesendet …';
+      var data = {
+        Name: form.elements.name.value.trim(),
+        Telefon: form.elements.tel.value.trim(),
+        Abholdatum: form.elements.datum.value,
+        Bestellung: form.elements.wunsch.value.trim(),
+        _subject: 'Neue Vorbestellung über die Website – ' + form.elements.name.value.trim(),
+        _template: 'table',
+        _captcha: 'false'
+      };
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (!res.ok || String(res.j.success) === 'false') throw new Error(res.j.message || 'Fehler');
+          msg.hidden = false; form.reset();
+        })
+        .catch(function () { err.hidden = false; })
+        .then(function () { btn.disabled = false; btn.textContent = label; });
     });
   }
 })();
